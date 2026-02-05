@@ -1,13 +1,40 @@
-export interface NoteTag {
-  value: "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
-  label: string;
-}
+export type NoteTag =
+  | "Work"
+  | "Personal"
+  | "Meeting"
+  | "Shopping"
+  | "Ideas"
+  | "Travel"
+  | "Finance"
+  | "Health"
+  | "Important"
+  | "Todo";
 
 export interface Note {
   id: string;
   title: string;
   content: string;
-  tag: "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
   createdAt: string;
   updatedAt: string;
+  tag: NoteTag;
+}
+
+export interface NewNote {
+  title: string;
+  content: string;
+  tag: NoteTag;
+}
+
+export type NoteId = Note["id"];
+export type Tag = Note["tag"];
+
+export type NoteDraft = {
+  title: string;
+  content: string;
+  tag: NoteTag;
+};
+
+export interface NotesResponse {
+  notes: Note[];
+  totalPages: number;
 }

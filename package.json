@@ -11,6 +11,8 @@
   "dependencies": {
     "@tanstack/react-query": "^5.90.17",
     "axios": "^1.13.2",
+    "clsx": "^2.1.1",
+    "cookie": "^1.1.1",
     "formik": "^2.4.9",
     "next": "16.1.1",
     "react": "19.2.3",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/cookie": "^0.6.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
