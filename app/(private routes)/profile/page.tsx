@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next/navigation";
 import css from "./ProfilePage.module.css";
 import Link from "next/link";
