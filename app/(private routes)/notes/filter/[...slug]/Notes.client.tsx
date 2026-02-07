@@ -7,13 +7,12 @@ import NoteList from "@/components/NoteList/NoteList";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import Pagination from "@/components/Pagination/Pagination";
 import Link from "next/link";
-import type { NotesResponse, NoteTag } from "@/types/note";
+import type { NoteTag } from "@/types/note";
 
 import css from "./NotesPage.module.css";
 import { useState } from "react";
 
 type NotesClientProps = {
-  initialData: NotesResponse;
   tag?: string;
 };
 

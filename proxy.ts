@@ -7,96 +7,79 @@ const privateRoutes = ["/profile", "/notes"];
 const publicRoutes = ["/sign-in", "/sign-up"];
 
 export async function proxy(request: NextRequest) {
-  const cookiesStoreData = await cookies();
-  const accessToken = cookiesStoreData.get("accessToken")?.value;
-  const refreshToken = cookiesStoreData.get("refreshToken")?.value;
+  const cookieStore = await cookies();
+
+  const accessToken = cookieStore.get("accessToken")?.value;
+  const refreshToken = cookieStore.get("refreshToken")?.value;
 
   const { pathname } = request.nextUrl;
 
-  const isPrivateRoute = privateRoutes.some((route) =>
-    pathname.startsWith(route),
-  );
-  const isPublicRoute = publicRoutes.some((route) =>
-    pathname.startsWith(route),
-  );
+  const isPrivateRoute = privateRoutes.some((r) => pathname.startsWith(r));
+  const isPublicRoute = publicRoutes.some((r) => pathname.startsWith(r));
 
-  if (isPrivateRoute) {
-    if (!accessToken) {
-      if (refreshToken) {
-        try {
-          const data = await checkSessionServer();
-          const setCookie = data.headers["set-cookie"];
-
-          if (setCookie) {
-            const cookieArray = Array.isArray(setCookie)
-              ? setCookie
-              : [setCookie];
-
-            for (const cookieStr of cookieArray) {
-              const parsed = parse(cookieStr);
-              const options = {
-                expires: parsed.Expires ? new Date(parsed.Expires) : undefined,
-                path: parsed.Path,
-                maxAge: Number(parsed["Max-Age"]),
-              };
-
-              if (parsed.accessToken)
-                cookiesStoreData.set(
-                  "accessToken",
-                  parsed.accessToken,
-                  options,
-                );
-              if (parsed.refreshToken)
-                cookiesStoreData.set(
-                  "refreshToken",
-                  parsed.refreshToken,
-                  options,
-                );
-            }
-
-            if (isPublicRoute) {
-              return NextResponse.redirect(new URL("/", request.url), {
-                headers: {
-                  Cookie: cookiesStoreData.toString(),
-                },
-              });
-            }
-
-            if (isPrivateRoute) {
-              return NextResponse.next({
-                headers: {
-                  Cookie: cookiesStoreData.toString(),
-                },
-              });
-            }
-          }
-        } catch (error) {
-          console.error("Session check failed:", error);
-          if (isPrivateRoute) {
-            return NextResponse.redirect(new URL("/sign-in", request.url));
-          }
-        }
-      }
-
-      if (isPublicRoute) {
-        return NextResponse.next();
-      }
-
-      if (isPrivateRoute) {
-        return NextResponse.redirect(new URL("/sign-in", request.url));
-      }
-    }
-
-    if (isPublicRoute) {
+  if (isPublicRoute) {
+    if (accessToken) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
-    if (isPrivateRoute) {
+    return NextResponse.next();
+  }
+
+  if (isPrivateRoute) {
+    if (accessToken) {
       return NextResponse.next();
     }
+
+    if (refreshToken) {
+      try {
+        const data = await checkSessionServer();
+
+        if (!data) {
+          return NextResponse.redirect(new URL("/sign-in", request.url));
+        }
+
+        const setCookie = data.headers["set-cookie"];
+
+        if (setCookie) {
+          const cookieArray = Array.isArray(setCookie)
+            ? setCookie
+            : [setCookie];
+
+          for (const cookieStr of cookieArray) {
+            const parsed = parse(cookieStr);
+
+            const options = {
+              path: parsed.Path,
+              expires: parsed.Expires ? new Date(parsed.Expires) : undefined,
+              maxAge: parsed["Max-Age"] ? Number(parsed["Max-Age"]) : undefined,
+            };
+
+            if (parsed.accessToken) {
+              cookieStore.set("accessToken", parsed.accessToken, options);
+            }
+
+            if (parsed.refreshToken) {
+              cookieStore.set("refreshToken", parsed.refreshToken, options);
+            }
+          }
+
+          return NextResponse.next({
+            headers: {
+              Cookie: cookieStore.toString(),
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Session refresh failed:", error);
+      }
+    }
+
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/profile/:path*", "/sign-in", "/sign-up", "/notes/:path*"],
+  matcher: ["/profile/:path*", "/notes/:path*", "/sign-in", "/sign-up"],
 };

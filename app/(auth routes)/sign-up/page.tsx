@@ -3,7 +3,9 @@ import css from "./SignUpPage.module.css";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LoginRequest } from "@/types/user";
+
+import type { LoginRequest } from "@/types/auth";
+
 import { useUserAuthStore } from "@/lib/store/authStore";
 import { registerUser } from "@/lib/api/clientApi";
 

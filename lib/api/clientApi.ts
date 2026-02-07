@@ -1,11 +1,9 @@
 import type { NewNote, Note, NotesResponse, NoteTag } from "@/types/note";
 import { nextServer } from "./api";
-import type { LoginRequest, User, StatusMessage } from "@/types/user";
-
-export type UpdateUserRequest = {
-  userName?: string;
-  photoUrl?: string;
-};
+import type { User } from "@/types/user";
+import type { LoginRequest } from "@/types/auth";
+import type { StatusMessage } from "@/types/api";
+import type { UpdateUserRequest } from "@/types/api";
 
 export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
@@ -75,7 +73,6 @@ export const getMe = async (): Promise<User> => {
   return (await nextServer.get<User>("/users/me")).data;
 };
 
-export const updateMe = async (payload: UpdateUserRequest) => {
-  const res = await nextServer.put<User>("/auth/me", payload);
-  return res.data;
+export const updateMe = async (payload: UpdateUserRequest): Promise<User> => {
+  return (await nextServer.patch<User>("/users/me", payload)).data;
 };

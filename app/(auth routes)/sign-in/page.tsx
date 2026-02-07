@@ -2,7 +2,9 @@
 import css from "./SignInPage.module.css";
 
 import { useState } from "react";
-import { LoginRequest } from "@/types/user";
+
+import type { LoginRequest } from "@/types/auth";
+
 import { loginUser } from "@/lib/api/clientApi";
 import { useRouter } from "next/navigation";
 import { useUserAuthStore } from "@/lib/store/authStore";

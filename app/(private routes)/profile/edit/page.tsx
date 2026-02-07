@@ -17,6 +17,7 @@ export default function EditProfile() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     setIsLoading(true);
@@ -24,6 +25,7 @@ export default function EditProfile() {
       .then((user) => {
         setUserName(user.username || "");
         setPhotoUrl(user.avatar || "");
+        setEmail(user.email || "");
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setIsLoading(false));
@@ -42,8 +44,8 @@ export default function EditProfile() {
       }
 
       const updatedUser = await updateMe({
-        userName: userName,
-        photoUrl: finalPhotoUrl,
+        username: userName,
+        avatar: finalPhotoUrl,
       });
 
       setUser(updatedUser);
@@ -75,14 +77,13 @@ export default function EditProfile() {
 
         <form onSubmit={handleSaveUser} className={css.profileInfo}>
           <div className={css.usernameWrapper}>
-            <label htmlFor="username">Username</label>
+            <label htmlFor="email">Email</label>
             <input
-              id="username"
-              type="text"
+              id="email"
+              type="email"
               className={css.input}
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              required
+              value={email}
+              readOnly
             />
           </div>
           <div className={css.actions}>

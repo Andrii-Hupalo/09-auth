@@ -18,7 +18,6 @@ export async function generateMetadata({
   const { id } = await params;
   const note = await fetchNoteByIDServer(id);
 
-
   if (!note) {
     return { title: "Note not found" };
   }
@@ -53,26 +52,24 @@ export async function generateMetadata({
   };
 }
 
-const NoteDetails = async ({ params }: NoteDetailsProps) => {
+export default async function NoteDetails({ params }: NoteDetailsProps) {
   const { id } = await params;
   const queryClient = new QueryClient();
 
-  
-  const data = await queryClient.fetchQuery({
+  const note = await fetchNoteByIDServer(id);
+
+  if (!note) {
+    redirect("/notes");
+  }
+
+  await queryClient.prefetchQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteByIDServer(id),
   });
-
-  
-  if (!data) {
-    redirect("/notes");
-  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <NoteDetailsClient />
     </HydrationBoundary>
   );
-};
-
-export default NoteDetails;
+}

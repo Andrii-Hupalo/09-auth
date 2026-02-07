@@ -3,6 +3,7 @@ import { nextServer } from "./api";
 import { User } from "@/types/user";
 import { cookies } from "next/headers";
 import axios from "axios";
+import type { AxiosResponse } from "axios";
 
 const getAuthHeaders = async () => {
   const cookieStore = await cookies();
@@ -68,12 +69,21 @@ export const fetchNoteByIDServer = async (id: string): Promise<Note | null> => {
   }
 };
 
-export const checkSessionServer = async () => {
+export const checkSessionServer = async (): Promise<AxiosResponse | null> => {
   try {
     const config = await getAuthHeaders();
-    const response = await nextServer.get(`/auth/session`, config);
-    return response.data;
-  } catch {
+    const response = await nextServer.get("/auth/session", config);
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        "checkSessionServer Error:",
+        error.response?.status || error.message,
+      );
+    } else {
+      console.error("checkSessionServer Error:", (error as Error).message);
+    }
+
     return null;
   }
 };
