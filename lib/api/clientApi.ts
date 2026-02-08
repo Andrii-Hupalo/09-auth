@@ -4,11 +4,18 @@ import type { User } from "@/types/user";
 import type { LoginRequest } from "@/types/auth";
 import type { StatusMessage } from "@/types/api";
 import type { UpdateUserRequest } from "@/types/api";
+import axios from "axios";
+
+// Клієнт для локальних Next.js API routes
+const localApi = axios.create({
+  baseURL: "/api",
+  withCredentials: true,
+});
 
 export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
-  const { data } = await nextServer.post("/upload", formData);
+  const { data } = await localApi.post("/upload", formData);
   return data.url;
 };
 

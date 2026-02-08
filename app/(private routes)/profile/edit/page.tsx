@@ -77,6 +77,18 @@ export default function EditProfile() {
 
         <form onSubmit={handleSaveUser} className={css.profileInfo}>
           <div className={css.usernameWrapper}>
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              className={css.input}
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              placeholder="Enter your username"
+            />
+          </div>
+
+          <div className={css.usernameWrapper}>
             <label htmlFor="email">Email</label>
             <input
               id="email"
