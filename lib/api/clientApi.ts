@@ -1,12 +1,12 @@
+"use client";
+
 import type { NewNote, Note, NotesResponse, NoteTag } from "@/types/note";
 import { nextServer } from "./api";
-import type { User } from "@/types/user";
 import type { LoginRequest } from "@/types/auth";
-import type { StatusMessage } from "@/types/api";
-import type { UpdateUserRequest } from "@/types/api";
+import type { User } from "@/types/user";
+import type { StatusMessage, UpdateUserRequest } from "@/types/api";
 import axios from "axios";
 
-// Клієнт для локальних Next.js API routes
 const localApi = axios.create({
   baseURL: "/api",
   withCredentials: true,
@@ -15,6 +15,7 @@ const localApi = axios.create({
 export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
+
   const { data } = await localApi.post("/upload", formData);
   return data.url;
 };
@@ -80,6 +81,10 @@ export const getMe = async (): Promise<User> => {
   return (await nextServer.get<User>("/users/me")).data;
 };
 
-export const updateMe = async (payload: UpdateUserRequest): Promise<User> => {
-  return (await nextServer.patch<User>("/users/me", payload)).data;
+export const updateMe = async (userData: UpdateUserRequest): Promise<User> => {
+  const endPoint = "/users/me";
+
+  const response = await nextServer.patch<User>(endPoint, userData);
+
+  return response.data;
 };
